@@ -1,10 +1,25 @@
 {
-    "name": "insomnia-plugin-laravel-sanctum-header",
+    "name": "insomnia-plugin-laravel-sanctum-cookie",
     "version": "0.0.1",
     "private": true,
     "insomnia": {
-        "name": "laravel-sanctum-header",
-        "description": ""
+        "name": "laravel_csrf_cookie",
+        "displayName": "Laravel Sanctum Cookie",
+        "description": "Retrieve the CSRF Cookie from Laravel Sanctum",
+        "publisher": {
+            "name": "Phendan",
+            "icon": "https://avatars.githubusercontent.com/u/10546560?v=4"
+        },
+        "unlisted": false
     },
+    "keywords": [
+        "laravel",
+        "sanctum",
+        "csrf",
+        "cookie",
+        "spa",
+        "insomnia-plugin"
+    ],
+    "homepage": "https://github.com/catppuccin/insomnia#readme",
     "main": "main.js"
 }

@@ -25,61 +25,24 @@ module.exports.templateTags = [
             const request = await context.util.models.request.getById(requestId)
             const response = await context.network.sendRequest(request)
 
+            console.log('Sent CSRF cookie request')
+
             if (response.error) {
-                throw new Error('Failed to send dependent request ' + response.error)
+                throw new Error(`Failed to send dependent request - ${response.error}`)
             }
 
-            const cookie = response.headers.find(
-                it => it.name === 'Set-Cookie' && it.value.includes(cookieName)
-            )
+            const cookie = response.headers.find(it => {
+                return it.name === 'Set-Cookie' && it.value.includes(cookieName)
+            })
 
-            const pattern = new RegExp(`(?<=${cookieName}=)[^;]+`, 'g')
-            const token = cookie?.value.match(pattern)[0]
-            // console.log('token', token)
-
-            // const token = cookie?.value
-            //     .split('; ')
-            //     .find(it => it.startsWith(`${cookieName}=`))
-            //     ?.split('=')
-            //     .at(1)
-
-            // console.log('token', token)
-
-            // const cookieJar = await this.getCookieJar(context)
-            // const token = cookieJar.cookies?.find(cookie => cookie.key === cookieName)
-
-            if (typeof token === 'undefined') {
+            if (typeof cookie === 'undefined') {
                 throw new Error(`Could not find "${cookieName}" in cookies`)
             }
 
-            console.log('ran csrf cookie request')
+            const pattern = new RegExp(`(?<=${cookieName}=)[^;]+`, 'g')
+            const token = cookie.value.match(pattern)[0]
 
             return decodeURIComponent(token)
-        },
-
-        async getCookieJar(context) {
-            const { meta } = context
-
-            if (!meta.requestId || !meta.workspaceId) {
-                throw new Error(`Request ID or workspace ID not found`)
-            }
-
-            const workspace = await context.util.models.workspace.getById(
-                meta.workspaceId
-            )
-
-            if (!workspace) {
-                throw new Error(`Workspace not found for ${meta.workspaceId}`)
-            }
-
-            const cookieJar =
-                await context.util.models.cookieJar.getOrCreateForWorkspace(workspace)
-
-            if (!cookieJar) {
-                throw new Error(`Cookie jar not found for ${meta.workspaceId}`)
-            }
-
-            return cookieJar
         }
     }
 ]
