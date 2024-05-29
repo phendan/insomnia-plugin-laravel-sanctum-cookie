@@ -20,33 +20,35 @@ module.exports.templateTags = [
             }
         ],
         async run(context, requestId, cookieName = 'XSRF-TOKEN') {
-            if (requestId === 'n/a') throw new Error(`Please select a request`)
+            if (requestId === 'n/a') throw new Error(`Please select a request`);
 
-            const request = await context.util.models.request.getById(requestId)
-            const response = await context.network.sendRequest(request)
+            const request = await context.util.models.request.getById(requestId);
+            const response = await context.network.sendRequest(request);
 
-            console.log('Sent CSRF cookie request')
+            console.log('Sent CSRF cookie request');
 
             if (response.error) {
-                throw new Error(`Failed to send dependent request - ${response.error}`)
+                throw new Error(
+                    `Failed to send dependent request - ${response.error}`
+                );
             }
 
             const cookie = response.headers.find(it => {
-                return it.name === 'Set-Cookie' && it.value.includes(cookieName)
-            })
+                return it.name === 'Set-Cookie' && it.value.includes(cookieName);
+            });
 
             if (typeof cookie === 'undefined') {
-                throw new Error(`Could not find "${cookieName}" in cookies`)
+                throw new Error(`Could not find "${cookieName}" in response cookies`);
             }
 
-            const pattern = new RegExp(`(?<=${cookieName}=)[^;]+`, 'g')
-            const token = cookie.value.match(pattern)[0]
+            const pattern = new RegExp(`(?<=${cookieName}=)[^;]+`, 'g');
+            const token = cookie.value.match(pattern)[0];
 
-            return decodeURIComponent(token)
+            return decodeURIComponent(token);
         }
     }
-]
+];
 
 module.exports.requestHooks = [
     //
-]
+];
